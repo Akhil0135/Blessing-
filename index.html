@@ -1,125 +1,325 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Rachael — Birthday Surprise (Gold)</title>
 <style>
   :root{
-    --gold:#D9A94B;
-    --gold-deep:#b98b2e;
-    --cream:#FFF7EB;
-    --bg-night:#050510;
-    --bg-day:#fff6e8;
+    --gold: #D9A94B;
+    --gold-deep: #b98b2e;
+    --bg-night: #06102a;
+    --bg-day-from: #fff7eb;
+    --bg-day-to: #fff0d8;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
-  body{font-family:system-ui;overflow:hidden;background:var(--bg-night)}
+  body{
+    font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+    background: var(--bg-night);
+    color: #2b1a08;
+    overflow:hidden;
+  }
 
+  /* STAGE */
   .stage{position:relative;width:100vw;height:100vh;overflow:hidden}
 
-  /* NIGHT */
-  #night{position:absolute;inset:0;background:radial-gradient(circle at 30% 20%, #0d1435 0%, #03030a 70%);z-index:10;transition:opacity 2s ease}
+  /* TOP CROSS (always visible) */
+  #crossWrap{
+    position:fixed;
+    top:12px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:9999;
+    width:120px;
+    height:120px;
+    pointer-events:none;
+  }
+  #crossWrap svg{width:100%;height:100%;display:block;filter: drop-shadow(0 6px 20px rgba(217,169,75,0.45))}
 
-  .star{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:0;animation:twinkle 2s infinite ease-in-out}
-  @keyframes twinkle{0%,100%{opacity:0.2}50%{opacity:1}}
+  /* NIGHT LAYER */
+  #night{
+    position:absolute;inset:0;
+    background: radial-gradient(circle at 20% 15%, #0b1b3a 0%, #03030a 60%);
+    z-index:10;
+    transition:opacity 1.2s ease;
+  }
+  .moon{
+    position: absolute;
+    right:6vw; top:6vh;
+    width:120px;height:120px;border-radius:50%;
+    background: radial-gradient(circle,#fffbe8,#f1ddaa);
+    box-shadow:0 0 36px rgba(255,230,160,0.35);
+  }
+  /* Stars */
+  .star{
+    position:absolute;width:3px;height:3px;border-radius:50%;
+    background: linear-gradient(#fff9d9,#fff);
+    filter: drop-shadow(0 0 6px rgba(255,230,140,0.6));
+    animation: starTw 2.4s ease-in-out infinite;
+    opacity:0.2;
+  }
+  @keyframes starTw{0%{opacity:.2}50%{opacity:1}100%{opacity:.2}}
 
-  .moon{position:absolute;right:6vw;top:6vh;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,#fffef5,#f7e7b8);box-shadow:0 0 35px rgba(255,255,200,0.5)}
+  /* SNOW (small) */
+  .snow{position:fixed;width:7px;height:7px;border-radius:50%;background:white;opacity:.9;z-index:30;pointer-events:none;filter: drop-shadow(0 0 6px rgba(255,255,255,0.6))}
 
-  /* DAY */
-  #day{position:absolute;inset:0;background:linear-gradient(#fff7eb,#ffe7bf);opacity:0;z-index:9;transition:opacity 2s ease}
-  .sun{position:absolute;left:6vw;top:6vh;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,#fff7c8,#ffd45b);box-shadow:0 0 45px rgba(255,220,120,0.9);opacity:0;transition:opacity 2s ease}
+  /* DAY LAYER (sun evolves while moon fades) */
+  #day{
+    position:absolute;inset:0;
+    background: linear-gradient(180deg, var(--bg-day-from), var(--bg-day-to));
+    z-index:9;
+    opacity:0;
+    transition:opacity 1.2s ease;
+  }
+  .sun{
+    position:absolute; left:6vw; top:6vh;
+    width:120px;height:120px;border-radius:50%;
+    background: radial-gradient(circle,#fff7b8,#ffd24d);
+    box-shadow:0 0 40px rgba(255,210,100,0.6);
+    transform: scale(0.6);
+    transition: transform 1.2s ease, opacity 1.2s ease;
+    opacity:0.0;
+  }
 
-  /* FINAL */
-  #final{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:120px;color:var(--gold-deep);opacity:0;z-index:11;transition:opacity 1.5s ease}
+  /* FINAL LAYER */
+  #final{
+    position:absolute;inset:0;z-index:20;
+    display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:110px;
+    background: linear-gradient(180deg, rgba(255,250,240,0.03), rgba(255,250,240,0));
+    opacity:0; transition:opacity .9s ease;
+  }
+  .name{
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(36px, 9vw, 100px);
+    color: var(--gold);
+    text-shadow: 0 10px 30px rgba(217,169,75,0.35);
+    opacity:0; transform: translateY(16px); transition: all .9s ease;
+    pointer-events:none;
+  }
+  .controls{margin-top:18px}
+  .btn{
+    padding:12px 20px;border-radius:12px;border:none;font-weight:700;cursor:pointer;font-size:16px;
+  }
+  .btn-surprise{background: linear-gradient(180deg,var(--gold),var(--gold-deep)); color:#2b1a08}
+  .btn-verse{background:#fff;color:var(--gold-deep); box-shadow:0 6px 18px rgba(0,0,0,0.12); margin-left:12px}
 
-  /* CROSS at top center */
-  .cross{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:110px;height:110px;}
+  /* POEM & VERSE */
+  .poem{margin-top:18px;font-size:20px;color:#3b2b12;max-width:86vw;text-align:center;line-height:1.4;opacity:0;transform:translateY(10px);transition:all .6s ease}
+  .verse{margin-top:18px;font-size:20px;color:#3b2b12;max-width:86vw;text-align:center;line-height:1.4;display:none}
 
-  /* NEW SHARP CROSS */
-  .cross svg{width:100%;height:100%}
+  /* Petals & Butterflies (background images are data-URI set in JS) */
+  .petal{position:fixed;width:28px;height:28px;background-size:contain;background-repeat:no-repeat;pointer-events:none;z-index:15}
+  .butterfly{position:fixed;width:48px;height:48px;background-size:contain;background-repeat:no-repeat;pointer-events:none;z-index:50}
 
-  .name{margin-top:20px;font-family:'Great Vibes',cursive;font-size:clamp(40px,8vw,90px);color:var(--gold);text-shadow:0 8px 30px rgba(217,169,75,0.5);opacity:0;transition:opacity .8s ease,transform .8s ease;transform:translateY(10px)}
-
-  /* Buttons */
-  .controls{margin-top:20px}
-  .btn{padding:12px 22px;border-radius:12px;border:none;font-weight:700;cursor:pointer}
-  .btn-surprise{background:linear-gradient(var(--gold),var(--gold-deep));color:#2b1a08}
-  .btn-verse{background:white;color:var(--gold-deep);box-shadow:0 6px 18px rgba(0,0,0,0.15)}
-
-  /* Poem / Verse */
-  .poem{margin-top:18px;font-size:20px;color:#3b2b12;max-width:85vw;line-height:1.45;opacity:0;transform:translateY(10px);transition:all .8s ease}
-  .verse{margin-top:20px;font-size:20px;display:none;color:#3b2b12;max-width:86vw;line-height:1.5}
-
-  /* Snowfall */
-  .snow{position:absolute;width:6px;height:6px;border-radius:50%;background:white;opacity:.9;pointer-events:none;z-index:7}
-
-  /* Petals */
-  .petal{position:absolute;width:28px;height:28px;background-size:contain;background-repeat:no-repeat;pointer-events:none;z-index:8}
-
-  /* Butterflies */
-  .butterfly{position:absolute;width:56px;height:56px;background-size:contain;background-repeat:no-repeat;pointer-events:none;z-index:15}
+  /* responsive */
+  @media (max-width:520px){
+    .name{font-size:40px}
+    .sun{width:96px;height:96px;left:4vw;top:4vh}
+    .moon{width:96px;height:96px;right:4vw;top:4vh}
+  }
 </style>
 </head>
 <body>
-<div class="stage" id="stage">
-  <!-- NIGHT -->
-  <div id="night"><div class="moon"></div></div>
+  <div class="stage" id="stage">
 
-  <!-- DAY -->
-  <div id="day"><div class="sun" id="sun"></div></div>
-
-  <!-- FINAL -->
-  <div id="final">
-    <div class="cross">
-      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <!-- cross top center (inline svg) -->
+    <div id="crossWrap">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <defs>
-          <linearGradient id="goldGrad" x1="0" x2="1"><stop offset="0" stop-color="#FFF3C6"/><stop offset="1" stop-color="#D9A94B"/></linearGradient>
-          <filter id="goldGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
+          <linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#FFF3C6"/><stop offset="1" stop-color="#D9A94B"/></linearGradient>
+          <filter id="gl" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/></filter>
         </defs>
-        <path d="M45 5h10v35h35v10H55v35H45V50H10V40h35z" fill="url(#goldGrad)" filter="url(#goldGlow)" />
+        <g fill="url(#g)" filter="url(#gl)">
+          <!-- sharper cross shape -->
+          <path d="M46 4h8v36h36v8H54v36h-8V48H10v-8h36z"/>
+        </g>
       </svg>
     </div>
 
-    <div class="name" id="name">Rachael</div>
-    <div class="controls" id="controls"><button class="btn btn-surprise" id="surpriseBtn">Tap for Surprise</button></div>
-    <div class="poem" id="poem"></div>
-    <div class="verse" id="verse">"Charm is deceptive, and beauty is fleeting; but a woman who fears the Lord is to be praised." — <b>Proverbs 31:30</b></div>
+    <!-- Night Layer -->
+    <div id="night">
+      <div class="moon" id="moonEl"></div>
+    </div>
+
+    <!-- Day Layer -->
+    <div id="day">
+      <div class="sun" id="sunEl"></div>
+    </div>
+
+    <!-- Final layer -->
+    <div id="final">
+      <div class="name" id="name">Rachael</div>
+      <div class="controls" id="controls">
+        <button class="btn btn-surprise" id="surpriseBtn">Tap for Surprise</button>
+      </div>
+      <div class="poem" id="poem" aria-live="polite"></div>
+      <div class="verse" id="verse">“Charm is deceptive, and beauty is fleeting; but a woman who fears the Lord is to be praised.” — <strong>Proverbs 31:30</strong></div>
+    </div>
+
   </div>
-</div>
 
 <script>
-/* ---------------- STAR CREATION ---------------- */
-for(let i=0;i<120;i++){
-  const s=document.createElement('div');
-  s.className='star';
-  s.style.left=Math.random()*100+'vw';
-  s.style.top=Math.random()*100+'vh';
-  s.style.animationDelay=(Math.random()*2)+'s';
-  document.getElementById('night').appendChild(s);
+/* TIMINGS */
+const NIGHT_MS = 7000;
+const DAY_MS = 9000;
+const FINAL_DELAY = NIGHT_MS + DAY_MS;
+
+/* create twinkling stars */
+const night = document.getElementById('night');
+for(let i=0;i<100;i++){
+  const s = document.createElement('div');
+  s.className = 'star';
+  s.style.left = Math.random()*100 + 'vw';
+  s.style.top = Math.random()*100 + 'vh';
+  s.style.animationDelay = (Math.random()*2) + 's';
+  night.appendChild(s);
 }
 
-/* ---------------- SNOWFALL ---------------- */
-function snow(){
-  const s=document.createElement('div');
-  s.className='snow';
-  s.style.left=Math.random()*100+'vw';
-  s.style.top='-10px';
-  s.style.opacity=Math.random();
+/* snow falling (small) */
+function spawnSnow(){
+  const s = document.createElement('div');
+  s.className = 'snow';
+  s.style.left = Math.random()*100 + 'vw';
+  s.style.top = '-10px';
+  s.style.opacity = 0.2 + Math.random()*0.8;
   document.body.appendChild(s);
-  const fall=10+Math.random()*6;
-  s.style.transition=`transform ${fall}s linear, opacity ${fall}s linear`;
-  requestAnimationFrame(()=>s.style.transform=`translateY(${innerHeight+60}px)`);
-  setTimeout(()=>s.remove(), fall*1000);
+  const duration = 8 + Math.random()*6;
+  s.style.transition = `transform ${duration}s linear, opacity ${duration}s linear`;
+  requestAnimationFrame(()=> s.style.transform = `translateY(${window.innerHeight + 80}px)`);
+  setTimeout(()=> s.remove(), duration*1000 + 200);
 }
-setInterval(snow,120);
+const snowInterval = setInterval(spawnSnow, 120);
 
-/* ---------------- PETALS ---------------- */
-const petalSVG=encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 2c4 3 8 7 6 11s-7 3-10 0c-3-3 0-8 4-11z' fill='%23FFD9B3' stroke='%23E6B87A'/></svg>`);
+/* petal (data-uri SVG) */
+const petalSVG = encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 2c4 3 8 7 6 11s-7 3-10 0c-3-3 0-8 4-11z' fill='%23FFD9B3' stroke='%23E6B87A'/></svg>`);
+function spawnPetal(){
+  const p = document.createElement('div');
+  p.className = 'petal';
+  p.style.left = Math.random()*100 + 'vw';
+  p.style.top = '-40px';
+  p.style.backgroundImage = `url("data:image/svg+xml;utf8,${petalSVG}")`;
+  document.body.appendChild(p);
+  const dur = 5 + Math.random()*4;
+  p.style.transition = `transform ${dur}s linear, opacity ${dur}s linear`;
+  requestAnimationFrame(()=> {
+    p.style.transform = `translateY(${window.innerHeight + 120}px) rotate(${Math.random()*540}deg)`;
+    p.style.opacity = 0.6;
+  });
+  setTimeout(()=> p.remove(), (dur*1000)+200);
+}
+const petalInterval = setInterval(spawnPetal, 700);
 
-function petals(){
-  const p=document.createElement('div');
-  p.className='petal';
-  p.style.left=Math.random()*100+'vw';
-  p.style.top='-40px';
-  p.style.backgroundImage=`url("data:image/svg+xml,
+/* butterfly (data-uri SVG) */
+const butterflySVG = encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><g><path d='M8 24c6-8 18-8 18-8s2 8-4 14S4 30 8 24z' fill='%23EBC07A' stroke='%23C89B45'/><path d='M56 24c-6-8-18-8-18-8s-2 8 4 14 22-2 14-6z' fill='%23F6D88F' stroke='%23C89B45'/><ellipse cx='32' cy='34' rx='4' ry='6' fill='%23C07A2A'/></g></svg>`);
+
+function spawnButterfly(x,y){
+  const b = document.createElement('div');
+  b.className = 'butterfly';
+  b.style.left = x + 'px';
+  b.style.top = y + 'px';
+  b.style.backgroundImage = `url("data:image/svg+xml;utf8,${butterflySVG}")`;
+  document.body.appendChild(b);
+  // random target
+  const tx = (Math.random() > 0.5 ? 1 : -1) * (120 + Math.random()*260);
+  const ty = -(150 + Math.random()*260);
+  const dur = 4 + Math.random()*2;
+  b.style.transition = `transform ${dur}s cubic-bezier(.22,.9,.35,1), opacity .8s linear ${dur-0.6}s`;
+  requestAnimationFrame(()=> {
+    b.style.transform = `translate(${tx}px, ${ty}px) scale(0.4)`;
+    b.style.opacity = 0;
+  });
+  setTimeout(()=> b.remove(), (dur*1000)+900);
+}
+
+/* SUN + MOON evolution logic:
+   - At t = NIGHT_MS: start fading moon and bring sun in (overlap)
+   - Sun scales up and becomes visible while moon fades out
+*/
+const moonEl = document.getElementById('moonEl');
+const sunEl = document.getElementById('sunEl');
+
+function evolveSunMoon(){
+  // fade moon out
+  moonEl.style.transition = 'opacity 1.4s ease, transform 1.4s ease';
+  moonEl.style.opacity = 0;
+  moonEl.style.transform = 'scale(0.9) translateY(-8px)';
+
+  // reveal + grow sun
+  sunEl.style.opacity = 1;
+  sunEl.style.transform = 'scale(1.12)';
+  // small pulse back to normal after brief moment
+  setTimeout(()=> sunEl.style.transform = 'scale(1)', 1200);
+}
+
+/* final reveal */
+function revealFinal(){
+  const final = document.getElementById('final');
+  final.style.opacity = 1;
+  // show name
+  setTimeout(()=>{
+    const nm = document.getElementById('name');
+    nm.style.opacity = 1;
+    nm.style.transform = 'translateY(0)';
+  }, 700);
+}
+
+/* schedule transitions */
+setTimeout(()=> { evolveSunMoon(); /* also make day BG visible */ document.getElementById('day').style.opacity = 1; }, NIGHT_MS);
+setTimeout(()=> { revealFinal(); }, FINAL_DELAY);
+
+/* Surprise button flow */
+const surpriseBtn = document.getElementById('surpriseBtn');
+const poemEl = document.getElementById('poem');
+const controls = document.getElementById('controls');
+const verseEl = document.getElementById('verse');
+
+surpriseBtn.addEventListener('click', ()=>{
+  // hide button
+  surpriseBtn.style.display = 'none';
+  // stop petals briefly
+  clearInterval(petalInterval);
+  // poem lines (rhyme)
+  const stanza = [
+    "A golden dawn, your smile aglow,",
+    "Like sunlit rivers, soft and slow.",
+    "Petals dance where footsteps stray,",
+    "Rachael, you turn night into day."
+  ];
+  poemEl.innerHTML = stanza.map(l => `<div>${l}</div>`).join('');
+  poemEl.style.opacity = 1;
+  poemEl.style.transform = 'translateY(0)';
+  // spawn butterflies from name
+  const r = document.getElementById('name').getBoundingClientRect();
+  for(let i=0;i<8;i++){
+    setTimeout(()=> spawnButterfly(r.left + r.width/2 + (Math.random()-0.5)*60, r.top + 10 + (Math.random()-0.5)*20), i*160);
+  }
+  // show Verse button after poem appears
+  setTimeout(()=>{
+    const v = document.createElement('button');
+    v.className = 'btn btn-verse';
+    v.textContent = 'Verse for You';
+    v.onclick = ()=> {
+      poemEl.style.display = 'none';
+      v.style.display = 'none';
+      verseEl.style.display = 'block';
+    };
+    controls.appendChild(v);
+  }, 1400);
+});
+
+/* Make sure star animations actually run (force initial opacity) */
+document.querySelectorAll('.star').forEach(s=> s.style.opacity = 0.2);
+
+/* Clean up on page hide/unload */
+window.addEventListener('pagehide', ()=> {
+  clearInterval(petalInterval);
+  clearInterval(snowInterval);
+});
+
+/* ensure snowInterval var exists in global scope */
+let snowInterval = setInterval(spawnSnow, 140);
+
+</script>
+</body>
+</html>
