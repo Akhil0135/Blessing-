@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Rachael — Birthday Surprise (Gold)</title>
+<style>
+  :root{
+    --gold:#D9A94B;
+    --gold-deep:#b98b2e;
+    --cream:#FFF7EB;
+    --bg-night:#0a0a18;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,Segoe UI,Roboto;overflow:hidden;background:var(--bg-night)}
+  .stage{position:relative;width:100vw;height:100vh;overflow:hidden}
+
+  /* NIGHT PHASE */
+  #night{position:absolute;inset:0;background:radial-gradient(circle at 20% 20%, #101a3a, #050510 70%);z-index:5;opacity:1;transition:opacity 1.5s ease}
+  .moon{position:absolute;right:6vw;top:6vh;width:120px;height:120px;border-radius:50%;background:radial-gradient(#fffce5,#e8ddb4);box-shadow:0 0 30px rgba(255,220,120,0.4)}
+  .star{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:0;animation:twinkle 2.2s infinite ease-in-out}
+  @keyframes twinkle{0%{opacity:.2}50%{opacity:1}100%{opacity:.2}}
+
+  /* FINAL PHASE */
+  #final{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:20;opacity:0;transition:opacity 1.4s ease}
+  .cross{width:120px;height:120px;margin-bottom:12px}
+  .name{font-family:'Great Vibes',cursive;font-size:64px;color:var(--gold);text-shadow:0 0 18px rgba(217,169,75,0.5);opacity:0;transform:translateY(10px);transition:all 1.2s ease}
+  .btn{padding:12px 20px;border:none;border-radius:12px;font-weight:700;cursor:pointer;margin-top:18px}
+  .btn-surprise{background:linear-gradient(var(--gold),var(--gold-deep));color:#2b1a08}
+
+  .poem{font-size:22px;color:#3b2b12;margin-top:20px;text-align:center;opacity:0;transition:.8s ease}
+  .verse{font-size:22px;color:#3b2b12;margin-top:20px;display:none;text-align:center}
+
+  /* PETALS & BUTTERFLIES */
+  .petal{position:absolute;width:26px;height:26px;background-size:contain;background-repeat:no-repeat;pointer-events:none;z-index:3}
+  .butterfly{position:absolute;width:48px;height:48px;background-size:contain;background-repeat:no-repeat;pointer-events:none;z-index:50}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div id="night">
+    <div class="moon"></div>
+  </div>
+
+  <div id="final">
+    <!-- CROSS -->
+    <svg class="cross" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="goldGrad" x1="0" x2="1">
+          <stop offset="0" stop-color="#fff3c6"/>
+          <stop offset="1" stop-color="#d9a94b"/>
+        </linearGradient>
+        <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <path d="M48 6h4v36h36v4H52v36h-4V46H12v-4h36z" fill="url(#goldGrad)" filter="url(#glow)"/>
+    </svg>
+
+    <div class="name" id="name">Rachael</div>
+    <button class="btn btn-surprise" id="surpriseBtn">Tap for Surprise</button>
+
+    <div class="poem" id="poem"></div>
+    <div class="verse" id="verse">“Charm is deceptive, and beauty is fleeting; but a woman who fears the Lord is to be praised.” — Proverbs 31:30</div>
+  </div>
+</div>
+
+<script>
+/* STAR CREATION */
+const night=document.getElementById('night');
+for(let i=0;i<90;i++){
+  const s=document.createElement('div');
+  s.className='star';
+  s.style.left=Math.random()*100+'vw';
+  s.style.top=Math.random()*100+'vh';
+  s.style.animationDelay=Math.random()*2+'s';
+  night.appendChild(s);
+}
+
+/* PETAL + BUTTERFLY ASSETS */
+const petalSVG=encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 2c4 3 8 7 6 11s-7 3-10 0c-3-3 0-8 4-11z' fill='%23FFD9B3' stroke='%23E6B87A'/></svg>`);
+const butterflySVG=encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><path d='M8 24c6-8 18-8 18-8s2 8-4 14S4 30 8 24z' fill='%23EBC07A' stroke='%23C89B45'/><path d='M56 24c-6-8-18-8-18-8s-2 8 4 14 22-2 14-6z' fill='%23F6D88F' stroke='%23C89B45'/><ellipse cx='32' cy='34' rx='4' ry='6' fill='%23C07A2A'/></svg>`);
+
+function spawnPetal(){
+  const p=document.createElement('div');
+  p.className='petal';
+  p.style.left=Math.random()*100+'vw';
+  p.style.top='-40px';
+  p.style.backgroundImage=`url("data:image/svg+xml;utf8,${petalSVG}")`;
+  p.style.transition='transform 7s linear, opacity 7s linear';
+  document.body.appendChild(p);
+  requestAnimationFrame(()=>{
+    p.style.transform=`translateY(${window.innerHeight+80}px) rotate(${Math.random()*720}deg)`;
+    p.style.opacity=0;
+  });
+  setTimeout(()=>p.remove(),7500);
+}
+let petalInterval=setInterval(spawnPetal,700);
+
+function spawnButterfly(x,y){
+  const b=document.createElement('div');
+  b.className='butterfly';
+  b.style.left=x+'px';
+  b.style.top=y+'px';
+  b.style.backgroundImage=`url("data:image/svg+xml;utf8,${butterflySVG}")`;
+  document.body.appendChild(b);
+  const tx=(Math.random()>0.5?1:-1)*(150+Math.random()*200);
+  const ty=-(150+Math.random()*250);
+  b.style.transition=`transform 5s ease-in-out, opacity 1s linear 4s`;
+  requestAnimationFrame(()=>{
+    b.style.transform=`translate(${tx}px,${ty}px) scale(0.4)`;
+    b.style.opacity=0;
+  });
+  setTimeout(()=>b.remove(),6000);
+}
+
+/* TIMELINE */
+setTimeout(()=>{
+  night.style.opacity=0;
+},7000);
+
+setTimeout(()=>{
+  const final=document.getElementById('final');
+  final.style.opacity=1;
+  setTimeout(()=>{
+    const nm=document.getElementById('name');
+    nm.style.opacity=1;
+    nm.style.transform='translateY(0)';
+  },1200);
+},7000+9000);
+
+/* SURPRISE BUTTON */
+const surpriseBtn=document.getElementById('surpriseBtn');
+const poemEl=document.getElementById('poem');
+const verseEl=document.getElementById('verse');
+
+surpriseBtn.onclick=()=>{
+  surpriseBtn.style.display='none';
+  clearInterval(petalInterval);
+  const stanza=[
+    'A golden dawn, your smile aglow,',
+    'Like sunlit rivers, soft and slow.',
+    'Petals dance where footsteps stray,',
+    'Rachael, you turn night into day.'
+  ];
+  poemEl.innerHTML=stanza.join('<br>');
+  poemEl.style.opacity=1;
+
+  const rect=document.getElementById('name').getBoundingClientRect();
+  for(let i=0;i<6;i++){
+    spawnButterfly(rect.left+rect.width/2,rect.top+10);
+  }
+
+  setTimeout(()=>{
+    const vb=document.createElement('button');
+    vb.className='btn btn-verse';
+    vb.textContent='Verse for You';
+    vb.onclick=()=>{
+      poemEl.style.display='none';
+      vb.style.display='none';
+      verseEl.style.display='block';
+    };
+    document.getElementById('final').appendChild(vb);
+  },1500);
+};
+</script>
+</body>
+</html>
