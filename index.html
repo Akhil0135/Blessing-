@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Rachael — Birthday Surprise (Gold)</title>
+<style>
+  :root{
+    --gold:#D9A94B;
+    --gold-deep:#b98b2e;
+    --cream:#FFF7EB;
+    --bg-night:#050510;
+    --bg-day:#fff6e8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:system-ui;overflow:hidden;background:var(--bg-night)}
+
+  .stage{position:relative;width:100vw;height:100vh;overflow:hidden}
+
+  /* NIGHT */
+  #night{position:absolute;inset:0;background:radial-gradient(circle at 30% 20%, #0d1435 0%, #03030a 70%);z-index:10;transition:opacity 2s ease}
+
+  .star{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:0;animation:twinkle 2s infinite ease-in-out}
+  @keyframes twinkle{0%,100%{opacity:0.2}50%{opacity:1}}
+
+  .moon{position:absolute;right:6vw;top:6vh;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,#fffef5,#f7e7b8);box-shadow:0 0 35px rgba(255,255,200,0.5)}
+
+  /* DAY */
+  #day{position:absolute;inset:0;background:linear-gradient(#fff7eb,#ffe7bf);opacity:0;z-index:9;transition:opacity 2s ease}
+  .sun{position:absolute;left:6vw;top:6vh;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,#fff7c8,#ffd45b);box-shadow:0 0 45px rgba(255,220,120,0.9);opacity:0;transition:opacity 2s ease}
+
+  /* FINAL */
+  #final{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:120px;color:var(--gold-deep);opacity:0;z-index:11;transition:opacity 1.5s ease}
+
+  /* CROSS at top center */
+  .cross{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:110px;height:110px;}
+
+  /* NEW SHARP CROSS */
+  .cross svg{width:100%;height:100%}
+
+  .name{margin-top:20px;font-family:'Great Vibes',cursive;font-size:clamp(40px,8vw,90px);color:var(--gold);text-shadow:0 8px 30px rgba(217,169,75,0.5);opacity:0;transition:opacity .8s ease,transform .8s ease;transform:translateY(10px)}
+
+  /* Buttons */
+  .controls{margin-top:20px}
+  .btn{padding:12px 22px;border-radius:12px;border:none;font-weight:700;cursor:pointer}
+  .btn-surprise{background:linear-gradient(var(--gold),var(--gold-deep));color:#2b1a08}
+  .btn-verse{background:white;color:var(--gold-deep);box-shadow:0 6px 18px rgba(0,0,0,0.15)}
+
+  /* Poem / Verse */
+  .poem{margin-top:18px;font-size:20px;color:#3b2b12;max-width:85vw;line-height:1.45;opacity:0;transform:translateY(10px);transition:all .8s ease}
+  .verse{margin-top:20px;font-size:20px;display:none;color:#3b2b12;max-width:86vw;line-height:1.5}
+
+  /* Snowfall */
+  .snow{position:absolute;width:6px;height:6px;border-radius:50%;background:white;opacity:.9;pointer-events:none;z-index:7}
+
+  /* Petals */
+  .petal{position:absolute;width:28px;height:28px;background-size:contain;background-repeat:no-repeat;pointer-events:none;z-index:8}
+
+  /* Butterflies */
+  .butterfly{position:absolute;width:56px;height:56px;background-size:contain;background-repeat:no-repeat;pointer-events:none;z-index:15}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <!-- NIGHT -->
+  <div id="night"><div class="moon"></div></div>
+
+  <!-- DAY -->
+  <div id="day"><div class="sun" id="sun"></div></div>
+
+  <!-- FINAL -->
+  <div id="final">
+    <div class="cross">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="goldGrad" x1="0" x2="1"><stop offset="0" stop-color="#FFF3C6"/><stop offset="1" stop-color="#D9A94B"/></linearGradient>
+          <filter id="goldGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
+        </defs>
+        <path d="M45 5h10v35h35v10H55v35H45V50H10V40h35z" fill="url(#goldGrad)" filter="url(#goldGlow)" />
+      </svg>
+    </div>
+
+    <div class="name" id="name">Rachael</div>
+    <div class="controls" id="controls"><button class="btn btn-surprise" id="surpriseBtn">Tap for Surprise</button></div>
+    <div class="poem" id="poem"></div>
+    <div class="verse" id="verse">"Charm is deceptive, and beauty is fleeting; but a woman who fears the Lord is to be praised." — <b>Proverbs 31:30</b></div>
+  </div>
+</div>
+
+<script>
+/* ---------------- STAR CREATION ---------------- */
+for(let i=0;i<120;i++){
+  const s=document.createElement('div');
+  s.className='star';
+  s.style.left=Math.random()*100+'vw';
+  s.style.top=Math.random()*100+'vh';
+  s.style.animationDelay=(Math.random()*2)+'s';
+  document.getElementById('night').appendChild(s);
+}
+
+/* ---------------- SNOWFALL ---------------- */
+function snow(){
+  const s=document.createElement('div');
+  s.className='snow';
+  s.style.left=Math.random()*100+'vw';
+  s.style.top='-10px';
+  s.style.opacity=Math.random();
+  document.body.appendChild(s);
+  const fall=10+Math.random()*6;
+  s.style.transition=`transform ${fall}s linear, opacity ${fall}s linear`;
+  requestAnimationFrame(()=>s.style.transform=`translateY(${innerHeight+60}px)`);
+  setTimeout(()=>s.remove(), fall*1000);
+}
+setInterval(snow,120);
+
+/* ---------------- PETALS ---------------- */
+const petalSVG=encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 2c4 3 8 7 6 11s-7 3-10 0c-3-3 0-8 4-11z' fill='%23FFD9B3' stroke='%23E6B87A'/></svg>`);
+
+function petals(){
+  const p=document.createElement('div');
+  p.className='petal';
+  p.style.left=Math.random()*100+'vw';
+  p.style.top='-40px';
+  p.style.backgroundImage=`url("data:image/svg+xml,
